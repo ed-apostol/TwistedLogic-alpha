@@ -3,7 +3,7 @@ twistedlogic-alpha
 
 Early versions of TwistedLogic chess engine.
 
-Saving for my own reference and for posterity. These are my first programs. I skipped "hello world". :)
+Saving for my own reference and for posterity. These are my first program when I'm just learning programming. I skipped "hello world". :)
 
 
 
