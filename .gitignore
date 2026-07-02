@@ -1,0 +1,11 @@
+# compiled engine binaries produced by tools/arbiter.py
+tools/build/
+
+# python bytecode
+__pycache__/
+*.pyc
+
+# engine log files (Logic18 writes these into its working directory)
+logfile.txt
+errfile.txt
+dumpfile.txt

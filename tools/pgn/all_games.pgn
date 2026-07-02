@@ -1,0 +1,220 @@
+[Event "TwistedLogic round-robin"]
+[Site "?"]
+[Date "2026.07.03"]
+[Round "1"]
+[White "Logic18"]
+[Black "omega9"]
+[Result "0-1"]
+[Termination "checkmate"]
+
+1. e4 e5 2. Nc3 Bb4 3. Nf3 Bxc3 4. dxc3 Nf6 5. Bd3 O-O 6. h3 d5 7. Nxe5 Qe7 8. Bg5 dxe4 9. f4 exf3 10. Bxh7+ Kxh7 11. Qd4 fxg2 12. Rg1 Bxh3 13. Qh4+ Kg8 14. Qg3 Nbd7 15. Qxh3 Qxe5+ 16. Be3 Rae8 17. Kd2 Ne4+ 18. Kd1 Nf2+ 19. Bxf2 Qe2+ 20. Kc1 Qxf2 21. b4 Qxg1+ 22. Kb2 Qxa1+ 23. Kxa1 g1=Q+ 24. Kb2 f5 25. Qd3 Nb6 26. a3 g5 27. Qf3 Re4 28. Ka2 g4 29. Qd3 Qc1 30. b5 Re3 31. Qd4 Qxc2+ 32. Ka1 Re1+ 33. Qd1 Rxd1# 0-1
+
+[Event "TwistedLogic round-robin"]
+[Site "?"]
+[Date "2026.07.03"]
+[Round "2"]
+[White "omega9"]
+[Black "Logic18"]
+[Result "1-0"]
+[Termination "checkmate"]
+
+1. Nc3 e5 2. Nf3 Qf6 3. e4 Ne7 4. Bc4 Ng6 5. O-O a6 6. d4 exd4 7. Nd5 Qd6 8. Nxd4 Nc6 9. Be3 Nxd4 10. Bxd4 c5 11. Bc3 b5 12. Ba5 bxc4 13. Nc7+ Ke7 14. Qxd6+ Kxd6 15. Rad1+ Ke7 16. Nxa8 Bb7 17. Nb6 Ke8 18. Rfe1 Ne5 19. f4 Ng6 20. Rxd7 Bc8 21. Ra7 Bg4 22. Nxc4 Nxf4 23. Nd6+ Bxd6 24. Ra8+ Kd7 25. Rxh8 h6 26. e5 Bc7 27. Bxc7 Kxc7 28. Rh7 Ng6 29. Rxg7 Be6 30. Rh7 Bxa2 31. e6 Bc4 32. Rxf7+ Kb8 33. Rf5 Ne7 34. Rxc5 Ba2 35. b3 Ng6 36. Ra5 Bxb3 37. cxb3 Ne7 38. Rxa6 Kb7 39. Rd6 Nf5 40. Rd5 Nh4 41. Rh5 Ng6 42. e7 Nxe7 43. Rxe7+ Kc8 44. Rd5 h5 45. h4 Kb8 46. Rd8# 1-0
+
+[Event "TwistedLogic round-robin"]
+[Site "?"]
+[Date "2026.07.03"]
+[Round "3"]
+[White "Logic18"]
+[Black "gamma"]
+[Result "1/2-1/2"]
+[Termination "repetition"]
+
+1. e4 b6 2. Bc4 a6 3. Nc3 c5 4. Nf3 d6 5. d4 Bg4 6. Bxf7+ Kxf7 7. Ng5+ Ke8 8. Qxg4 cxd4 9. Ne6 Nf6 10. Qh3 Qc8 11. Nxg7+ Kd8 12. Ne6+ Ke8 13. Ng7+ Kd8 14. Ne6+ Ke8 1/2-1/2
+
+[Event "TwistedLogic round-robin"]
+[Site "?"]
+[Date "2026.07.03"]
+[Round "4"]
+[White "gamma"]
+[Black "Logic18"]
+[Result "1/2-1/2"]
+[Termination "repetition"]
+
+1. a4 e5 2. c3 Nc6 3. e3 Nf6 4. d3 d5 5. f3 Bc5 6. b4 Bd6 7. g3 Bf5 8. g4 Bg6 9. h3 Nd7 10. h4 Be7 11. e4 dxe4 12. fxe4 Bxh4+ 13. Ke2 Qf6 14. Kd2 Bg5+ 15. Ke1 Bh4+ 16. Kd2 Bg5+ 17. Ke1 Bh4+ 1/2-1/2
+
+[Event "TwistedLogic round-robin"]
+[Site "?"]
+[Date "2026.07.03"]
+[Round "5"]
+[White "Logic18"]
+[Black "alpha"]
+[Result "1-0"]
+[Termination "checkmate"]
+
+1. e4 e5 2. Nc3 Qe7 3. Nf3 Qb4 4. Nxe5 Qd4 5. Qh5 Ke7 6. Qxf7+ Kd6 7. Nb5+ Kc5 8. Qxf8+ Ne7 9. Qxe7+ Qd6 10. Qxg7 Qb6 11. Nxd7+ Kc6 12. Nxb6 Kxb6 13. Qxh8 c6 14. Qd8+ Ka6 15. b4 b6 16. Qxc8# 1-0
+
+[Event "TwistedLogic round-robin"]
+[Site "?"]
+[Date "2026.07.03"]
+[Round "6"]
+[White "alpha"]
+[Black "Logic18"]
+[Result "1/2-1/2"]
+[Termination "repetition"]
+
+1. d4 Nc6 2. d5 Na5 3. e4 e5 4. Be3 Qh4 5. Qd3 Nf6 6. Qb5 Qxe4 7. Qxa5 Bb4+ 8. Qxb4 Qxb4+ 9. c3 Qxb2 10. Bg5 Qxa1 11. Bd3 Nxd5 12. c4 Nb4 13. Bf5 d5 14. Bxc8 Rxc8 15. cxd5 Nxd5 16. f3 Qxb1+ 17. Kf2 Qxa2+ 18. Kf1 Qa1+ 19. Kf2 O-O 20. Bd2 Qa2 21. Ke1 Qa1+ 22. Kf2 Qa2 23. Ke1 Qa1+ 1/2-1/2
+
+[Event "TwistedLogic round-robin"]
+[Site "?"]
+[Date "2026.07.03"]
+[Round "7"]
+[White "Logic18"]
+[Black "edsel1"]
+[Result "1-0"]
+[Termination "checkmate"]
+
+1. e4 d6 2. Nc3 e6 3. Qg4 e5 4. Qg3 f6 5. Nf3 b6 6. d4 h5 7. Qg6+ Kd7 8. Qf5+ Kc6 9. Qg6 Kd7 10. Qf5+ Ke8 11. Bb5+ c6 12. Qg6+ Ke7 13. Bc4 a5 14. Qf7# 1-0
+
+[Event "TwistedLogic round-robin"]
+[Site "?"]
+[Date "2026.07.03"]
+[Round "8"]
+[White "edsel1"]
+[Black "Logic18"]
+[Result "0-1"]
+[Termination "checkmate"]
+
+1. c3 d5 2. d3 Nc6 3. e3 Nf6 4. f3 e5 5. a4 Bc5 6. g3 Bf5 7. Nd2 Bxe3 8. Nb3 Bxc1 9. Nxc1 Qd6 10. Nb3 Nb4 11. Nd2 Nxd3+ 12. Bxd3 Bxd3 13. h3 Qb6 14. h4 Qe3+ 15. Qe2 Bxe2 16. Nxe2 O-O 17. b4 Nh5 18. g4 Ng3 19. b5 Qxe2# 0-1
+
+[Event "TwistedLogic round-robin"]
+[Site "?"]
+[Date "2026.07.03"]
+[Round "9"]
+[White "omega9"]
+[Black "gamma"]
+[Result "1-0"]
+[Termination "checkmate"]
+
+1. Nc3 Nh6 2. d4 b6 3. Bxh6 gxh6 4. Nf3 Rg8 5. Qd3 Rg7 6. O-O-O a5 7. Qd2 Ba6 8. Kb1 c5 9. dxc5 b5 10. e4 Qc8 11. Nd5 Qb7 12. Qxa5 Qc6 13. Nc7+ Kd8 14. Nxa8+ Ke8 15. Nc7+ Kd8 16. Nxb5+ Ke8 17. Nc7+ Kd8 18. Nxa6+ Kc8 19. Nxb8 Kxb8 20. Qd8+ Qc8 21. Rxd7 f6 22. Qb6+ Ka8 23. Qa7# 1-0
+
+[Event "TwistedLogic round-robin"]
+[Site "?"]
+[Date "2026.07.03"]
+[Round "10"]
+[White "gamma"]
+[Black "omega9"]
+[Result "0-1"]
+[Termination "checkmate"]
+
+1. a4 Nc6 2. e3 d5 3. c3 Bf5 4. d4 Qd7 5. f4 O-O-O 6. b3 Kb8 7. g3 e6 8. h4 Nf6 9. Ra2 Bxb1 10. Ra3 Bxa3 11. Bxa3 Be4 12. Bf8 Rhxf8 13. Qe2 Bxh1 14. Qf3 Bxf3 15. Nxf3 Ne4 16. Ng5 Nxc3 17. Nxh7 Rh8 18. Ng5 f6 19. Nh3 Ne4 20. Ng1 Nxg3 21. Bg2 Nf5 22. Bh3 Nxe3 23. Kf2 Nc2 24. Kf1 N6xd4 25. a5 Rxh4 26. Bg2 Rxf4+ 27. Nf3 e5 28. Kf2 Nxf3 29. Bxf3 f5 30. Ke2 Nd4+ 31. Kf2 Rxf3+ 32. Kg2 Rxb3 33. Kg1 Qa4 34. Kf1 Qa1+ 35. Kg2 Rb2+ 36. Kh3 Qe1 37. a6 Rh8# 0-1
+
+[Event "TwistedLogic round-robin"]
+[Site "?"]
+[Date "2026.07.03"]
+[Round "11"]
+[White "omega9"]
+[Black "alpha"]
+[Result "1-0"]
+[Termination "checkmate"]
+
+1. Nc3 e5 2. Nf3 Bb4 3. Nxe5 Bxc3 4. dxc3 Qe7 5. Bf4 c5 6. Nc4 Nc6 7. Nd6+ Kd8 8. Qd5 Kc7 9. Nxf7+ Kb6 10. Qb3+ Ka5 11. Bc7+ Ka6 12. Qa4+ Na5 13. Qxa5# 1-0
+
+[Event "TwistedLogic round-robin"]
+[Site "?"]
+[Date "2026.07.03"]
+[Round "12"]
+[White "alpha"]
+[Black "omega9"]
+[Result "0-1"]
+[Termination "checkmate"]
+
+1. d4 d5 2. e3 Nc6 3. Bb5 Bd7 4. Bxc6 Bxc6 5. f4 Bb5 6. f5 Qd7 7. Nc3 O-O-O 8. Nxb5 Qxb5 9. c3 Nh6 10. g3 Nxf5 11. g4 Nd6 12. Kf2 Qd7 13. Kg3 Kb8 14. Kf4 Ne4 15. c4 dxc4 16. Kxe4 Qd5+ 17. Kf4 e5+ 18. Kg5 Be7+ 19. Kh5 exd4+ 20. g5 Qxg5# 0-1
+
+[Event "TwistedLogic round-robin"]
+[Site "?"]
+[Date "2026.07.03"]
+[Round "13"]
+[White "omega9"]
+[Black "edsel1"]
+[Result "1-0"]
+[Termination "checkmate"]
+
+1. Nc3 d6 2. Nf3 e6 3. e3 c6 4. Be2 f6 5. O-O c5 6. d4 cxd4 7. exd4 b6 8. Bf4 h5 9. Nh4 Ke7 10. Ng6+ Kd7 11. Bb5+ Kc7 12. Nxh8 Kb7 13. Qf3+ Kc7 14. Qxa8 f5 15. Nf7 g6 16. Qxa7+ Bb7 17. Nxd8 Kxd8 18. Qxb8+ Ke7 19. Qxb7+ Kd8 20. Qd7# 1-0
+
+[Event "TwistedLogic round-robin"]
+[Site "?"]
+[Date "2026.07.03"]
+[Round "14"]
+[White "edsel1"]
+[Black "omega9"]
+[Result "0-1"]
+[Termination "checkmate"]
+
+1. d4 d5 2. c3 Nc6 3. f4 Bf5 4. e3 Qd6 5. a4 O-O-O 6. Nd2 Nf6 7. g3 Kb8 8. h4 e6 9. Nb3 Be4 10. Kd2 Bxh1 11. Kc2 Ne4 12. Kb1 Nxg3 13. Nd2 Qe7 14. Kc2 Qxh4 15. Kb1 Nxf1 16. Nxf1 Be4+ 17. Ka2 Bd6 18. Nd2 Bf5 19. Nb3 h5 20. Ne2 Qh2 21. Qd2 Bg4 22. Qe1 Bxe2 23. Qxe2 Qxe2 24. e4 dxe4 25. d5 exd5 26. Rb1 Qc4 27. f5 Qxa4# 0-1
+
+[Event "TwistedLogic round-robin"]
+[Site "?"]
+[Date "2026.07.03"]
+[Round "15"]
+[White "gamma"]
+[Black "alpha"]
+[Result "1/2-1/2"]
+[Termination "repetition"]
+
+1. a4 d5 2. d4 Bd7 3. c3 Be6 4. e3 Qd7 5. b3 Qd6 6. a5 Kd7 7. Bb5+ Kc8 8. Bd2 f5 9. b4 Nf6 10. Bc1 Ne4 11. Bd2 Nxd2 12. Kxd2 g6 13. Be8 g5 14. Qa4 g4 15. Qb5 c5 16. bxc5 Qc7 17. Kc1 Bg7 18. Qa4 Bf6 19. Qb5 Bg7 20. Qa4 Bf6 21. Qb5 1/2-1/2
+
+[Event "TwistedLogic round-robin"]
+[Site "?"]
+[Date "2026.07.03"]
+[Round "16"]
+[White "alpha"]
+[Black "gamma"]
+[Result "1/2-1/2"]
+[Termination "repetition"]
+
+1. d4 b6 2. e4 a6 3. e5 c5 4. dxc5 bxc5 5. Qd5 Qa5+ 6. Kd1 Qb6 7. Qxa8 Qc7 8. Bd3 Qxe5 9. Bxh7 Rxh7 10. c4 Rxh2 11. Rxh2 Qxh2 12. Nf3 Qxg2 13. Qxb8 Qxf3+ 14. Ke1 Qe4+ 15. Be3 Qc6 16. f4 d6 17. Qb3 Bb7 18. Bxc5 dxc5 19. Qd3 Qh1+ 20. Qf1 Qe4+ 21. Kd1 Qd4+ 22. Kc1 Qe3+ 23. Nd2 Kd7 24. f5 Nh6 25. Qd1 Nxf5 26. Qg4 Qe1+ 27. Qd1 Qxd1+ 28. Kxd1 Bc6 29. Kc1 Kc8 30. Kb1 Kb8 31. b3 Kc7 32. a3 Kd6 33. Ra2 e5 34. Rc2 Kc7 35. Rc3 Bd6 36. Rd3 Kb8 37. Rc3 Kc7 38. Rd3 Kb8 39. Rc3 1/2-1/2
+
+[Event "TwistedLogic round-robin"]
+[Site "?"]
+[Date "2026.07.03"]
+[Round "17"]
+[White "gamma"]
+[Black "edsel1"]
+[Result "1-0"]
+[Termination "edsel1 failed to return a move (none/timeout/crash)"]
+
+1. a4 d6 2. d4 e6 3. c3 d5 4. b3 c6 5. f4 f6 6. g3 f5 7. b4 a6 8. a5 h5 9. h4 1-0
+
+[Event "TwistedLogic round-robin"]
+[Site "?"]
+[Date "2026.07.03"]
+[Round "18"]
+[White "edsel1"]
+[Black "gamma"]
+[Result "0-1"]
+[Termination "checkmate"]
+
+1. c3 b6 2. d3 a6 3. d4 c5 4. dxc5 bxc5 5. e4 Nh6 6. f4 Qa5 7. e5 Qa4 8. Qxa4 e6 9. g3 Be7 10. a3 Rg8 11. b3 Rf8 12. h3 Rh8 13. Nd2 Rg8 14. Ne4 Nf5 15. c4 Rf8 16. Nf2 Nxg3 17. Qxa6 Bxa6 18. Ng4 Nxh1 19. Ne3 Bh4+ 20. Kd2 Nc6 21. Ng2 g5 22. a4 Na5 23. Kc3 Bf2 24. fxg5 Bxg1 25. Kc2 Rb8 26. h4 Rxb3 27. Nf4 Ke7 28. Ne2 Bxc4 29. Nxg1 Bxf1 30. Kd2 Bg2 31. Kc2 Rd8 32. Kd2 Rc8 33. Kc2 Rcb8 34. Kd2 Nc4+ 35. Ke2 Nxe5 36. Kd1 Rd3+ 37. Ke2 Ng3+ 38. Ke1 Nh5 39. Ke2 Rb6 40. a5 Ng3+ 41. Ke1 Rb7 42. a6 Rb8 43. a7 Rb4 44. Kf2 Be4 45. Nh3 Ng4+ 46. Ke1 Ba8 47. Ng1 Re4+ 48. Ne2 Rxe2# 0-1
+
+[Event "TwistedLogic round-robin"]
+[Site "?"]
+[Date "2026.07.03"]
+[Round "19"]
+[White "alpha"]
+[Black "edsel1"]
+[Result "1/2-1/2"]
+[Termination "fifty-move rule"]
+
+1. d4 d6 2. e4 e6 3. c4 c6 4. f4 f6 5. Qh5+ g6 6. Qf3 a6 7. Qe3 b6 8. Qd3 h6 9. Qe3 a5 10. Qd3 h5 11. Qe3 a4 12. Qd3 h4 13. Qe3 Na6 14. Bd3 Kd7 15. Bc2 Ne7 16. Bxa4 Ke8 17. Qd3 Kf7 18. Be3 Ke8 19. Bb3 Kf7 20. Bc2 Ke8 21. Qe2 Kf7 22. Bd3 Kg8 23. Bd2 Kg7 24. Qe3 Kg8 25. Bc2 Kf7 26. Qd3 Ke8 27. Be3 Kd7 28. Qe2 Ng8 29. Bd3 Ke7 30. Bd2 Kd7 31. Qe3 Ke7 32. Bc2 Ke8 33. Qf2 Ke7 34. Bd3 Kf7 35. Be3 Kg7 36. Bc2 Kf7 37. b3 Kg7 38. Bd3 Kf7 39. Be2 Ne7 40. Bd2 Ke8 41. Bd3 Kf7 42. Qe3 Ke8 43. Bc2 Kf7 44. Qd3 Ke8 45. Be3 Kd7 46. Qe2 Ng8 47. Bd3 Ke7 48. Bd2 Ke8 49. Bc2 Kf7 50. Be3 Ke7 51. Bd3 Kf7 52. Bf2 Kg7 53. Qe3 Kf7 54. Bc2 Ne7 55. Qd3 Ke8 56. Qe2 Kf7 57. Bd3 Ke8 58. Qe3 Kf7 59. Bc2 Ke8 60. Qd3 Kf7 61. Be3 Ke8 62. Qe2 Kf7 63. Bf2 Ke8 64. Bd3 Kf7 65. Qf3 Ke8 66. Be3 Kf7 67. Bc2 Ke8 68. Bd2 Kf7 69. Qe3 Ke8 70. Qd3 Kf7 71. Qc3 Ke8 72. Bd3 Kd7 73. Be3 Ng8 74. Qd2 Ke7 75. Bc2 Ke8 76. Bf2 Ke7 77. Bd3 Nh6 78. Bxh4 Kf7 79. Qe3 Ke7 80. Bg3 Kf7 81. Bc2 Ke7 82. Qd3 Kf7 83. Qe2 Ke7 84. Bd3 Kf7 85. Qe3 Ke7 86. Bc2 Ke8 87. Qd2 Ke7 88. Bd3 Kf7 89. Be2 Ke7 90. Qe3 Kf7 91. Qd3 Ke7 92. Qc2 Kf7 93. Bd3 Ke7 94. Bf2 Kf7 95. Be3 Ke7 96. Be2 Ke8 97. Qd3 Ke7 98. Qc3 Kf7 99. Bd3 Kg8 100. Qd2 Kh7 101. Bc2 Nb8 102. Qd3 Kg8 103. b4 Kh7 104. Qe2 Kg8 105. Bd3 Kf7 106. Kd2 Ke7 107. Bf2 Kf7 108. Qe3 Ke7 109. Be2 Kf7 110. Qd3 Ke7 111. Be3 Kf7 112. Qc3 Ke7 113. Bd3 Kf7 114. Qb3 Ke7 115. Be2 Kf7 116. Qd3 Ke7 117. Qc3 Kf7 118. Bd3 Ke7 119. Qb3 Kf7 120. Be2 Ke7 121. Bf2 Kf7 122. Qe3 Ke7 123. Qd3 Kf7 124. Qc3 Ke7 125. Bd3 Ke8 126. Qb3 Kd7 127. Be2 Ke7 128. Qc3 Kf7 129. Qf3 Ke7 130. Bd3 Kf7 131. Be3 Ke7 132. Be2 Kf7 133. Qf2 Ke7 134. Bd3 Kf7 135. Kc2 Ke7 136. Be2 Kf7 137. Bd2 Ke7 138. Bd3 Kf7 139. Qe3 Ke7 140. Be2 Kf7 141. Qd3 Ke7 142. Be3 Kf7 143. Qc3 Ke7 144. Bd3 Kf7 145. Qd2 Ke7 146. Be2 Kf7 147. Qd3 Ke7 148. Qc3 Kf7 149. Bd3 Ke7 150. Qd2 Kf7 151. Be2 Ke7 152. Bf2 Kf7 1/2-1/2
+
+[Event "TwistedLogic round-robin"]
+[Site "?"]
+[Date "2026.07.03"]
+[Round "20"]
+[White "edsel1"]
+[Black "alpha"]
+[Result "1/2-1/2"]
+[Termination "repetition"]
+
+1. d4 d5 2. c3 Bd7 3. e3 Be6 4. f3 Qd7 5. f4 Qd6 6. a4 Kd7 7. b3 f5 8. g3 Nc6 9. h3 Nf6 10. h4 Ne4 11. Nf3 Nxg3 12. Ng1 Nxh1 13. Kd2 b6 14. Kd3 Nf2+ 15. Kc2 Nxd1 16. Kxd1 Qxf4 17. exf4 Kd6 18. Nd2 Bd7 19. Nb1 e6 20. Nd2 Be7 21. Nb1 Bxh4 22. Kc2 Ne7 23. Kd1 c6 24. Na3 Ng6 25. Nb1 Ke7 26. Nd2 Nxf4 27. b4 Kd6 28. Ndf3 Bf6 29. Bxf4+ Ke7 30. Bd2 Kf7 31. Be3 Be7 32. Bc1 Bd6 33. Nd2 Ke7 34. Nb1 Kf6 35. Ke2 Be7 36. Kd1 g6 37. Ke2 Bd6 38. Kd1 Ke7 39. Ke2 Kf7 40. Kd1 Be7 41. Nd2 f4 42. Nb1 Bf6 43. Nd2 Ke7 44. Nb1 Rhf8 45. Nd2 Kd6 46. Nb1 Be7 47. Na3 Rf5 48. Nb1 Bf6 49. Ke2 Kc7 50. Kd1 Be7 51. Ke2 Bg5 52. Kd1 Kd6 53. Na3 Rf6 54. Nc2 Kc7 55. Ke2 f3+ 56. Nxf3 Bxc1 57. Rxc1 Kd6 58. Nd2 Ke7 59. Na1 Rf5 60. Kd3 Kd6 61. Ndb3 Rf3+ 62. Ke2 Rf4 63. Nd2 Ke7 64. Kd3 Rf5 65. Ke3 Kd6 66. Kd3 Kc7 67. Ndb3 Rf3+ 68. Ke2 Rf4 69. Nd2 Kd6 70. Kd3 Ke7 71. Ke3 g5 72. Ndb3 Kd6 73. Nd2 Rf5 74. Ndb3 Ke7 75. Nd2 Kf6 76. Ndb3 Kf7 77. Ke2 Ke7 78. Ke3 Kd6 79. Nd2 Kc7 80. Ndb3 Rf6 81. Nd2 Kd6 82. Ndb3 Ke7 83. Nd2 Kf7 84. Ndb3 Kg6 85. Ke2 Rf5 86. Ke3 Kf6 87. Ke2 Rf4 88. Ke3 Ke7 89. Nd2 Kd6 90. Ndb3 Kc7 91. Nd2 Rf6 92. Ndb3 Kd6 93. Nd2 Ke7 94. Ndb3 Kf7 95. Ke2 Rf5 96. Ke3 Kg6 97. Ke2 Rf4 98. Ke3 Kf5 99. Ke2 Ke4 100. Nd2+ Kf5 101. Ndb3 Re4+ 102. Kd2 Kf4 103. Kd1 Re3 104. Kd2 g4 105. Bg2 g3 106. Bh3 Ke4 107. Bg2+ Rf3 108. Bxf3+ Kxf3 109. Kc2 Ke4 110. Kd1 Kf5 111. Kc2 Ke4 112. a5 bxa5 113. Nc5+ Kf5 114. bxa5 Be8 115. Nb7 Ke4 116. a6 Bd7 117. Kb3 Kf5 118. Ka4 Kf4 119. Nc5 Bc8 120. Kb3 Rb8+ 121. Ka3 Kg5 122. Na4 Bxa6 123. Nc5 Bc8 124. Na4 Bd7 125. Rc2 Kf4 126. Nc5 Be8 127. Nxe6+ Ke4 128. Nf8 h6 129. Nh7 Bd7 130. Nf6+ Kf5 131. Nxd7 Rb5 132. Ka4 Ke4 133. Nf6+ Kf4 134. Nh7 Ke4 135. Nf8 Kf5 136. Nh7 Ke4 137. Nf8 Kf5 138. Nd7 Ke4 1/2-1/2
+

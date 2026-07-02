@@ -70,7 +70,7 @@
 /*DATA STRUCTURES                            */
 /*********************************************/
 
-typedef long long u64;
+typedef unsigned long long u64;
 typedef long u32;
 typedef u32 move;
 typedef struct {
@@ -1231,8 +1231,156 @@ void isgameover(int onmove) {
     else if (reps() > 1) printf("1/2-1/2 {Draw by repetition}\n");
 }
 
+/*********************************************/
+/*PERFT (move generation validation)         */
+/*********************************************/
+
+u64 perft(int onmove, int depth, int ply) {
+    int i, mc;
+    u64 count = 0;
+    if (depth == 0) return 1;
+    mc = genmoves(onmove, ply);
+    for (i = 0; i < mc; ++i) {
+        if (domove(M[ply][i].m, onmove)) {
+            count += perft(onmove ^ 1, depth - 1, ply + 1);
+            undomove(onmove);
+        }
+    }
+    return count;
+}
+
+/* Minimal FEN parser. Sets up pieces[][], the 4 rotated empty[] boards, and
+   status->{castle,epsq,fifty,mat,hash,m}. Returns the side to move. */
+int setupfen(char *fen) {
+    int i, j, sq, rank, file, p, c, onmove;
+    char *s = fen;
+    memset(pieces, 0, sizeof(pieces));
+    memset(empty, 0, sizeof(empty));
+    memset(H, 0, sizeof(H));
+    status = H;
+    rank = 7; file = 0;
+    for (; *s && *s != ' '; ++s) {
+        char ch = *s;
+        if (ch == '/') { rank--; file = 0; }
+        else if (ch >= '1' && ch <= '8') file += ch - '0';
+        else {
+            sq = rank * 8 + file;
+            c = (ch >= 'a') ? BLACK : WHITE;
+            switch (ch) {
+            case 'P': case 'p': p = PAWN; break;
+            case 'N': case 'n': p = KNIGHT; break;
+            case 'B': case 'b': p = BISHOP; break;
+            case 'R': case 'r': p = ROOK; break;
+            case 'Q': case 'q': p = QUEEN; break;
+            case 'K': case 'k': p = KING; break;
+            default: p = 0; break;
+            }
+            if (p) {
+                pieces[c][p] ^= bitmask[R000][sq];
+                pieces[c][ALL] ^= bitmask[R000][sq];
+            }
+            file++;
+        }
+    }
+    for (i = 0; i < 64; ++i)
+        if (!((pieces[WHITE][ALL] | pieces[BLACK][ALL]) & bitmask[R000][i]))
+            for (j = 0; j < 4; ++j) empty[j] ^= bitmask[j][i];
+    while (*s == ' ') ++s;
+    onmove = (*s == 'b') ? BLACK : WHITE;
+    while (*s && *s != ' ') ++s;
+    while (*s == ' ') ++s;
+    status->castle = 0;
+    for (; *s && *s != ' '; ++s) {
+        switch (*s) {
+        case 'K': status->castle |= WCKS; break;
+        case 'Q': status->castle |= WCQS; break;
+        case 'k': status->castle |= BCKS; break;
+        case 'q': status->castle |= BCQS; break;
+        }
+    }
+    while (*s == ' ') ++s;
+    if (*s == '-') { status->epsq = -1; ++s; }
+    else if (*s >= 'a' && *s <= 'h') {
+        file = *s - 'a'; ++s;
+        rank = (*s >= '1' && *s <= '8') ? (*s - '1') : 0;
+        status->epsq = rank * 8 + file;
+        if (*s) ++s;
+    }
+    else status->epsq = -1;
+    status->fifty = 0;
+    status->mat[WHITE] = status->mat[BLACK] = 0;
+    for (i = 0; i < 64; ++i) {
+        u64 b = bitmask[R000][i];
+        if (b & pieces[WHITE][ALL]) { p = getpiece(b, WHITE); if (p != KING) status->mat[WHITE] += pcval[p]; }
+        else if (b & pieces[BLACK][ALL]) { p = getpiece(b, BLACK); if (p != KING) status->mat[BLACK] += pcval[p]; }
+    }
+    status->hash = 0;
+    status->m = 0;
+    return onmove;
+}
+
+/* Per-root-move breakdown, for localizing move-generation bugs. */
+void perftdivide(int onmove, int depth) {
+    int i, mc;
+    u64 total = 0, c;
+    mc = genmoves(onmove, 0);
+    for (i = 0; i < mc; ++i) {
+        move mv = M[0][i].m;
+        if (domove(mv, onmove)) {
+            c = (depth > 1) ? perft(onmove ^ 1, depth - 1, 1) : 1;
+            undomove(onmove);
+            total += c;
+            printf("%s %llu\n", displaymove(mv), c);
+        }
+    }
+    printf("total %llu\n", total);
+    fflush(stdout);
+}
+
+/* Run perft on the standard reference positions and print greppable lines. */
+void runperft(int maxd) {
+    static char *fens[6] = {
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -",
+        "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -",
+        "r3k2r/3q4/2n1b3/7n/1bB5/2N2N2/1B2Q3/R3K2R w KQkq - 0 1",
+        "rnbq1bnr/1pppkp1p/4p3/2P1P3/p5p1/8/PP1PKPPP/RNBQ1BNR w - - 0 1",
+        "rn1q1bnr/1bP1kp1P/1p2p3/p7/8/8/PP1pKPpP/RNBQ1BNR w - - 0 1",
+        "r6r/3qk3/2n1b3/7n/1bB5/2N2N2/1B2QK2/R6R w - - 0 1"
+    };
+    int cap[6] = { 6, 5, 5, 5, 5, 5 };
+    int f, d, o;
+    for (f = 0; f < 6; ++f) {
+        o = setupfen(fens[f]);
+        printf("FEN%d: %s\n", f + 1, fens[f]);
+        for (d = 1; d <= maxd && d <= cap[f]; ++d) {
+            u64 n = perft(o, d, 0);
+            printf("perft %d %llu  FEN%d\n", d, n, f + 1);
+            fflush(stdout);
+        }
+    }
+}
+
+/* Build a clean lowercase coordinate string (e2e4 / e7e8q) directly from a
+   move's from/to/promotion, with no trailing space or stray NUL. Natural
+   board orientation: file = 'a'+(sq&7), rank = '1'+(sq>>3). */
+void buildcoord(move m, char *out) {
+    int from = FROM(m), to = TO(m), prom = PROM(m), n = 0;
+    out[n++] = (char)('a' + FILE(from));
+    out[n++] = (char)('1' + RANK(from));
+    out[n++] = (char)('a' + FILE(to));
+    out[n++] = (char)('1' + RANK(to));
+    switch (prom) {
+    case KNIGHT: out[n++] = 'n'; break;
+    case BISHOP: out[n++] = 'b'; break;
+    case ROOK:   out[n++] = 'r'; break;
+    case QUEEN:  out[n++] = 'q'; break;
+    default: break;
+    }
+    out[n] = '\0';
+}
+
 int main(void) {
-    char fff[256];
+    char fff[4096];
     char s[256];
     char strmov[6];
     move m; int i, mc;
@@ -1262,7 +1410,7 @@ int main(void) {
             continue;
         }
         if (!xboard) printf("command> ");
-        if (!fgets(fff, 255, stdin)) return 1;
+        if (!fgets(fff, 4096, stdin)) return 1;
         if (fff[0] == '\n') continue;
         sscanf(fff, "%s", s);
         if (!strcmp(s, "xboard")) {
@@ -1275,6 +1423,81 @@ int main(void) {
             initgame();
             onmove = WHITE;
             machine = BLACK;
+            continue;
+        }
+        if (!strcmp(s, "perft")) {
+            int d = 5;
+            sscanf(fff, "perft %d", &d);
+            runperft(d);
+            initgame();
+            onmove = WHITE;
+            machine = -1;
+            continue;
+        }
+        if (!strcmp(s, "play")) {
+            char *p = fff;
+            char mv[8], coord[8];
+            int d = 1, om = WHITE, mc2, ok = 1, n2;
+            move bm;
+            /* skip leading whitespace and the "play" token */
+            while (*p == ' ' || *p == '\t') ++p;
+            while (*p && *p != ' ' && *p != '\t' && *p != '\n' && *p != '\r') ++p;
+            /* parse depth, then skip past its digits */
+            if (sscanf(p, "%d", &d) != 1 || d < 1) d = 1;
+            while (*p == ' ' || *p == '\t') ++p;
+            while (*p >= '0' && *p <= '9') ++p;
+            /* reset to the start position cheaply (tables stay built) */
+            initgame();
+            om = WHITE;
+            /* replay m1..mk using the existing parse + make-move path */
+            for (;;) {
+                while (*p == ' ' || *p == '\t') ++p;
+                if (!*p || *p == '\n' || *p == '\r') break;
+                n2 = 0;
+                while (*p && *p != ' ' && *p != '\t' && *p != '\n' && *p != '\r' && n2 < 6)
+                    mv[n2++] = *p++;
+                mv[n2] = '\0';
+                while (*p && *p != ' ' && *p != '\t' && *p != '\n' && *p != '\r') ++p;
+                mc2 = genmoves(om, 127);
+                bm = parsemove(mv, om, mc2);
+                if (!bm || !domove(bm, om)) { ok = 0; break; }
+                om ^= 1;
+            }
+            if (!ok) {
+                printf("bestmove error\n");
+                fflush(stdout);
+                onmove = om; machine = -1;
+                continue;
+            }
+            /* fixed-depth search: no book, no post, effectively infinite time */
+            tryopening = 0;
+            post = FALSE;
+            mytime = 3600000;
+            myotim = 3600000;
+            bm = think(d, om);
+            if (!bm) {
+                /* fall back to the first legal move if search returned nothing */
+                mc2 = genmoves(om, 127);
+                for (i = 0; i < mc2; ++i)
+                    if (domove(M[127][i].m, om)) { undomove(om); bm = M[127][i].m; break; }
+            }
+            if (!bm) printf("bestmove none\n");
+            else { buildcoord(bm, coord); printf("bestmove %s\n", coord); }
+            fflush(stdout);
+            onmove = om; machine = -1;
+            continue;
+        }
+        if (!strcmp(s, "divide")) {
+            int d = 1;
+            sscanf(fff, "divide %d", &d);
+            perftdivide(onmove, d);
+            continue;
+        }
+        if (!strcmp(s, "fen")) {
+            char *p = fff + 3;
+            while (*p == ' ') ++p;
+            onmove = setupfen(p);
+            machine = -1;
             continue;
         }
         if (!strcmp(s, "force")) {

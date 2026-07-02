@@ -153,6 +153,23 @@ char *mov2str(move *m){
     return str;
 }
 
+/* Build a clean coordinate string (e.g. "e2e4" or "e7e8q") for the arbiter's
+   `play` command. Unlike mov2str this appends no trailing space and no NUL byte
+   to stdout; it just writes a plain, lowercase, NUL-terminated coordinate. */
+void bestcoord(move *m, char *buf){
+    static char promstr[14]="ppnnbbrrqqkk ";
+    buf[0]=FILE(m->from)+'a';
+    buf[1]='8'-RANK(m->from);
+    buf[2]=FILE(m->to)+'a';
+    buf[3]='8'-RANK(m->to);
+    if(m->prom==EMT){
+        buf[4]='\0';
+    }else{
+        buf[4]=promstr[m->prom];
+        buf[5]='\0';
+    }
+}
+
 int *movptr(int attack, int pc){
     static int knightd[9]={-31, -33, -14, -18, 14, 18, 33, 31, 0};
 	static int bishopd[5]={-15, -17, 15, 17, 0};
@@ -296,6 +313,18 @@ void push(int ply, int mc, int from, int to, int type){
 	else m->prom=EMT;
 }
 
+void pushprom(int ply, int mc, int from, int to, int prom){
+    register move *m=&M[ply][mc];
+    m->from=from;
+    m->to=to;
+    m->pc=B.pc[from];
+    m->capt=B.pc[to];
+    m->type=PROM;
+    m->prom=prom;
+    if(m->capt!=EMT) m->score=(pcval[m->capt]*10)-pcval[m->pc]+valpcprom[prom];
+    else m->score=valpcprom[prom];
+}
+
 int genmoves(int ply, int depth){
     register int i, j, k,  m, g, mc=0;
     register int *ptr;
@@ -320,7 +349,10 @@ int genmoves(int ply, int depth){
                         break;
                     }
                     else if(RANK(m)==(B.side?7:0)){
-                        push(ply, mc+=4, i, m, PROM);
+                        pushprom(ply, mc++, i, m, WN+B.side);
+                        pushprom(ply, mc++, i, m, WB+B.side);
+                        pushprom(ply, mc++, i, m, WR+B.side);
+                        pushprom(ply, mc++, i, m, WQ+B.side);
                         break;
                     }
                     else if(RANK(i)==(B.side?1:6)){
@@ -340,7 +372,12 @@ int genmoves(int ply, int depth){
                         break;
                     }
                     else if(*ptr!=(B.side?16:-16)){
-                        if(RANK(m)==(B.side?7:0)) push(ply, mc++, i, m, PROM);
+                        if(RANK(m)==(B.side?7:0)){
+                            pushprom(ply, mc++, i, m, WN+B.side);
+                            pushprom(ply, mc++, i, m, WB+B.side);
+                            pushprom(ply, mc++, i, m, WR+B.side);
+                            pushprom(ply, mc++, i, m, WQ+B.side);
+                        }
                         else push(ply, mc++, i, m, NORMAL);
                         break;
                     }
@@ -393,11 +430,11 @@ BOOL makemove(register move *m){
 		if((m->from-m->to)==2){
 		    if(B.pc[m->to-1]!=EMT) return FALSE;
 		    rfrom=m->to-2;
-		    rto=m->from+1;
+		    rto=m->from-1;
 		}
 		else{
 		    rfrom=m->to+1;
-		    rto=m->from-1;
+		    rto=m->from+1;
 		}
 		B.pc[rto]=B.pc[rfrom];
 		B.pc[rfrom]=EMT;
@@ -416,7 +453,7 @@ BOOL makemove(register move *m){
 	h->mat[BLACK]=B.mat[BLACK];
 	h->kpos[WHITE]=B.kpos[WHITE];
 	h->kpos[BLACK]=B.kpos[BLACK];
-	B.castle=castlemask[m->from]&castlemask[m->to];
+	B.castle&=castlemask[m->from]&castlemask[m->to];
 	if(m->prom!=EMT){
 	    B.pc[m->to]=m->prom;
 	    B.mat[B.side]+=valpcprom[m->prom];
@@ -425,7 +462,7 @@ BOOL makemove(register move *m){
 	B.pc[m->from]=EMT;
 	if((m->pc<WN)||(m->capt!=EMT)) B.fifty=0;
 	else B.fifty+=1;
-	if(m->type==EPCAP) B.mat[!B.side]-=pcval[WP];
+	if(m->type==EPCAP){ B.mat[!B.side]-=pcval[WP]; B.pc[m->to+(B.side?-16:16)]=EMT; }
 	if(m->type==PWN2) B.epsq=m->to+(B.side?-16:16);
 	else B.epsq=-1;
 	if(m->capt!=EMT) B.mat[!B.side]-=pcval[m->capt];
@@ -517,10 +554,106 @@ move *think(void){
     return &pv[0][0];
 }
 
+unsigned long long perft(int depth, int ply){
+    int i, n;
+    unsigned long long count=0;
+    if(depth==0) return 1ULL;
+    n=genmoves(ply, 1);
+    for(i=0; i<n; ++i){
+        if(!makemove(&M[ply][i])) continue;
+        count+=perft(depth-1, ply+1);
+        unmake();
+    }
+    return count;
+}
+
+void setfen(char *fen){
+    int i, sq, rank, file;
+    char c, *p=fen;
+    for(i=0; i<128; ++i) B.pc[i]=EMT;
+    rank=0; file=0;
+    while(*p && *p!=' '){
+        c=*p++;
+        if(c=='/'){ rank++; file=0; continue; }
+        if(c>='1' && c<='8'){ file+=c-'0'; continue; }
+        sq=rank*16+file;
+        switch(c){
+            case 'P': B.pc[sq]=WP; break;
+            case 'p': B.pc[sq]=BP; break;
+            case 'N': B.pc[sq]=WN; break;
+            case 'n': B.pc[sq]=BN; break;
+            case 'B': B.pc[sq]=WB; break;
+            case 'b': B.pc[sq]=BB; break;
+            case 'R': B.pc[sq]=WR; break;
+            case 'r': B.pc[sq]=BR; break;
+            case 'Q': B.pc[sq]=WQ; break;
+            case 'q': B.pc[sq]=BQ; break;
+            case 'K': B.pc[sq]=WK; B.kpos[WHITE]=sq; break;
+            case 'k': B.pc[sq]=BK; B.kpos[BLACK]=sq; break;
+        }
+        file++;
+    }
+    while(*p==' ') p++;
+    B.side=(*p=='b')?BLACK:WHITE;
+    while(*p && *p!=' ') p++;
+    while(*p==' ') p++;
+    B.castle=0;
+    while(*p && *p!=' '){
+        switch(*p){
+            case 'K': B.castle|=WCKS; break;
+            case 'Q': B.castle|=WCQS; break;
+            case 'k': B.castle|=BCKS; break;
+            case 'q': B.castle|=BCQS; break;
+        }
+        p++;
+    }
+    while(*p==' ') p++;
+    if(*p=='-' || *p=='\0' || *p=='\n') B.epsq=-1;
+    else{
+        file=p[0]-'a';
+        rank=8-(p[1]-'0');
+        B.epsq=rank*16+file;
+    }
+    B.mat[WHITE]=0; B.mat[BLACK]=0;
+    for(i=0; i<128; ++i){
+        if(i&0x88) continue;
+        if(B.pc[i]==EMT) continue;
+        if(B.pc[i]&1) B.mat[BLACK]+=pcval[B.pc[i]];
+        else B.mat[WHITE]+=pcval[B.pc[i]];
+    }
+    B.hply=0;
+    B.fifty=0;
+}
+
+void doperft(int maxd){
+    static char *fenlist[6]={
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -",
+        "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -",
+        "r3k2r/3q4/2n1b3/7n/1bB5/2N2N2/1B2Q3/R3K2R w KQkq - 0 1",
+        "rnbq1bnr/1pppkp1p/4p3/2P1P3/p5p1/8/PP1PKPPP/RNBQ1BNR w - - 0 1",
+        "rn1q1bnr/1bP1kp1P/1p2p3/p7/8/8/PP1pKPpP/RNBQ1BNR w - - 0 1",
+        "r6r/3qk3/2n1b3/7n/1bB5/2N2N2/1B2QK2/R6R w - - 0 1"
+    };
+    static char *fenname[6]={"start","kiwipete","castle","ep","promotion","no-nothing"};
+    int fi, d;
+    unsigned long long n;
+    for(fi=0; fi<6; ++fi){
+        setfen(fenlist[fi]);
+        for(d=1; d<=maxd; ++d){
+            n=perft(d, 0);
+            printf("perft %d %llu\n", d, n);
+            fflush(stdout);
+        }
+        printf("FEN %d %s: %s\n", fi+1, fenname[fi], fenlist[fi]);
+        fflush(stdout);
+    }
+    initgame();
+}
+
 int main(void){
     int i, j, movcnt, legal;
 	char s[256];
-    char line[256];
+    char line[4096];
     move *m;
     printf("Twisted Logic Chess Engine pre-alpha\n");
 	printf("by Edsel Apostol\n");
@@ -548,12 +681,18 @@ int main(void){
             continue;
         }
         if(!xboard) printf("command> ");
-        if (!fgets(line, 256, stdin))    return 1;
+        if (!fgets(line, 4096, stdin))    return 1;
         if(line[0]=='\n') continue;
         sscanf(line, "%s", s);
         if(!strcmp(s, "xboard")){
             xboard=TRUE;
             printf("feature playother=1 usermove=1 myname=TwistedLogic ping=1 done=1\n");
+            continue;
+        }
+        if(!strcmp(s, "perft")){
+            int pd=1;
+            sscanf(line, "perft %d", &pd);
+            doperft(pd);
             continue;
         }
         if(!strcmp(s, "quit")) exit(0);
@@ -641,6 +780,67 @@ int main(void){
                 }
             }
             if(!legal) printf("Illegalmove(not found on movelist):%s\n", move1);
+            continue;
+        }
+        if(!strcmp(s, "play")){
+            char coord[8];
+            char *tok;
+            int d, n, found, err;
+            move *bm;
+            tok=strtok(line, " \t\r\n");   /* skip the literal "play" token */
+            tok=strtok(NULL, " \t\r\n");   /* depth */
+            if(!tok){
+                printf("\nbestmove error\n");
+                fflush(stdout);
+                continue;
+            }
+            d=atoi(tok);
+            if(d<1) d=1;
+            if(d>MAXPLY) d=MAXPLY;
+            initgame();      /* cheap reset to the start position */
+            machine=EMT;     /* prevent the auto-play loop from firing */
+            err=FALSE;
+            while((tok=strtok(NULL, " \t\r\n"))!=NULL){
+                n=genmoves(0, 1);
+                found=FALSE;
+                for(i=0; i<n; ++i){
+                    bestcoord(&M[0][i], coord);
+                    if(!strcmp(coord, tok)){
+                        if(makemove(&M[0][i])) found=TRUE;
+                        break;
+                    }
+                }
+                if(!found){ err=TRUE; break; }
+            }
+            if(err){
+                printf("\nbestmove error\n");
+                fflush(stdout);
+                continue;
+            }
+            maxdepth=d;
+            maxtime=3600000;
+            post=FALSE;
+            bm=think();
+            if(bm->from==bm->to){   /* search yielded no usable move */
+                n=genmoves(0, 1);
+                found=FALSE;
+                for(i=0; i<n; ++i){
+                    if(makemove(&M[0][i])){
+                        unmake();
+                        bm=&M[0][i];
+                        found=TRUE;
+                        break;
+                    }
+                }
+                if(!found){
+                    printf("bestmove none\n");
+                    fflush(stdout);
+                    continue;
+                }
+            }
+            bestcoord(bm, coord);
+            printf("bestmove %s\n", coord);
+            fflush(stdout);
             continue;
         }
         printf("Error(unknown command):%s\n", s);

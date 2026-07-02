@@ -9,6 +9,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <string.h>
+#include <ctype.h>
 #include <sys/timeb.h>
 
 /*********************************************/
@@ -368,6 +370,11 @@ bit64_t ZobColor;
 FILE *logfile;
 FILE *errfile;
 FILE *dumpfile;
+
+/*********************************************/
+/*FORWARD DECLARATIONS                       */
+/*********************************************/
+int isAtt(const position_t *pos, int color, u64 target);
 
 /*********************************************/
 /*FUNCTIONS                                  */
@@ -1161,14 +1168,14 @@ int moveIsLegal(const position_t *pos, int m, u64 pinned){
   if(isEnPassant(m)) {
     int capsq = (SQRANK(from) << 3) + SQFILE(to);
     u64 b = ~pos->pieces[EMPTY];
-    
-    b ^= from ^ capsq ^ to;
+
+    b ^= BitMask[from] ^ BitMask[capsq] ^ BitMask[to];
 
     return
       (!(rookAttacksBB(ksq, b) & (getPiecesBB(pos, QUEEN, them)
        | getPiecesBB(pos, ROOK, them))) &&
        !(bishopAttacksBB(ksq, b) & (getPiecesBB(pos, QUEEN, them)
-       | getPiecesBB(pos, ROOK, them))));
+       | getPiecesBB(pos, BISHOP, them))));
   }
   
   /* If the moving piece is a king, check whether the destination 
@@ -1512,21 +1519,29 @@ void setPosition(position_t *pos, char *fen) {
     if(pos->status->epsq != -1) pos->status->hash.b ^= ZobEpsq[pos->status->epsq].b;
     if(pos->side == BLACK) pos->status->hash.b ^= ZobColor.b;
 }
-/* the recursive perft routine, it execute make_move on all moves*/
+/* the recursive perft routine, it execute make_move on all moves.
+   Legality is verified the bullet-proof way: make the move, then check
+   whether the moving side left its own king in check.  This is correct
+   even when the side to move is already in check, unlike the pinned-piece
+   moveIsLegal() filter which assumes we are not in check. */
 void perft(position_t *pos, u32 maxply, u64 nodesx[]){
-    int move; u64 pinned;
+    int move;
     movelist_t movelist;
     if(pos->ply+1 > maxply) return;
     genMoves(pos, &movelist);
-    pinned = pinnedPieces(pos, pos->side);
     for(movelist.pos = 0; movelist.pos < movelist.size; movelist.pos++){
         move = movelist.list[movelist.pos].m;
-        if(!moveIsLegal(pos, move, pinned)) continue; 
-        nodesx[pos->ply+1]++;
         makeMove(pos, move);
+        /* pos->side now belongs to the opponent; the side that just moved
+           is pos->side^1 - reject the move if that king is attacked */
+        if(isAtt(pos, pos->side, pos->pieces[KING] & pos->color[pos->side^1])){
+            unmakeMove(pos);
+            continue;
+        }
+        nodesx[pos->ply]++;
         perft(pos, maxply, nodesx);
-        unmakeMove(pos); 
-    }   
+        unmakeMove(pos);
+    }
 }
 
 /* returns time in milli-seconds */
@@ -1583,10 +1598,164 @@ void runPerft(int max_depth){
     	}
     	Print(3, "\nDONE DOING PERFT ON FEN %d\n", x+1);
     	Print(3, "\n\n\n");
-    }      
+    }
 }
+
+/*********************************************/
+/*BASIC SEARCH                               */
+/* material + piece-square evaluation and a  */
+/* negamax alpha-beta search, added so the   */
+/* engine can actually pick a move and play. */
+/*********************************************/
+#define SCORE_INF   30000
+#define SCORE_MATE  29000
+
+/* centipawn material values indexed by piece type (EMPTY..KING) */
+static const int PieceValue[7] = { 0, 100, 320, 330, 500, 900, 20000 };
+
+/* piece-square tables written in visual order (index 0 = a8 .. 63 = h1) from
+   White's point of view. For a white piece on square sq use PST[pc][sq^56];
+   for a black piece use PST[pc][sq]. */
+static const int PST[7][64] = {
+    { 0 },
+    {   /* PAWN */
+        0,  0,  0,  0,  0,  0,  0,  0,
+       50, 50, 50, 50, 50, 50, 50, 50,
+       10, 10, 20, 30, 30, 20, 10, 10,
+        5,  5, 10, 25, 25, 10,  5,  5,
+        0,  0,  0, 20, 20,  0,  0,  0,
+        5, -5,-10,  0,  0,-10, -5,  5,
+        5, 10, 10,-20,-20, 10, 10,  5,
+        0,  0,  0,  0,  0,  0,  0,  0
+    },
+    {   /* KNIGHT */
+      -50,-40,-30,-30,-30,-30,-40,-50,
+      -40,-20,  0,  0,  0,  0,-20,-40,
+      -30,  0, 10, 15, 15, 10,  0,-30,
+      -30,  5, 15, 20, 20, 15,  5,-30,
+      -30,  0, 15, 20, 20, 15,  0,-30,
+      -30,  5, 10, 15, 15, 10,  5,-30,
+      -40,-20,  0,  5,  5,  0,-20,-40,
+      -50,-40,-30,-30,-30,-30,-40,-50
+    },
+    {   /* BISHOP */
+      -20,-10,-10,-10,-10,-10,-10,-20,
+      -10,  0,  0,  0,  0,  0,  0,-10,
+      -10,  0,  5, 10, 10,  5,  0,-10,
+      -10,  5,  5, 10, 10,  5,  5,-10,
+      -10,  0, 10, 10, 10, 10,  0,-10,
+      -10, 10, 10, 10, 10, 10, 10,-10,
+      -10,  5,  0,  0,  0,  0,  5,-10,
+      -20,-10,-10,-10,-10,-10,-10,-20
+    },
+    {   /* ROOK */
+        0,  0,  0,  0,  0,  0,  0,  0,
+        5, 10, 10, 10, 10, 10, 10,  5,
+       -5,  0,  0,  0,  0,  0,  0, -5,
+       -5,  0,  0,  0,  0,  0,  0, -5,
+       -5,  0,  0,  0,  0,  0,  0, -5,
+       -5,  0,  0,  0,  0,  0,  0, -5,
+       -5,  0,  0,  0,  0,  0,  0, -5,
+        0,  0,  0,  5,  5,  0,  0,  0
+    },
+    {   /* QUEEN */
+      -20,-10,-10, -5, -5,-10,-10,-20,
+      -10,  0,  0,  0,  0,  0,  0,-10,
+      -10,  0,  5,  5,  5,  5,  0,-10,
+       -5,  0,  5,  5,  5,  5,  0, -5,
+        0,  0,  5,  5,  5,  5,  0, -5,
+      -10,  5,  5,  5,  5,  5,  0,-10,
+      -10,  0,  5,  0,  0,  0,  0,-10,
+      -20,-10,-10, -5, -5,-10,-10,-20
+    },
+    {   /* KING (middlegame) */
+      -30,-40,-40,-50,-50,-40,-40,-30,
+      -30,-40,-40,-50,-50,-40,-40,-30,
+      -30,-40,-40,-50,-50,-40,-40,-30,
+      -30,-40,-40,-50,-50,-40,-40,-30,
+      -20,-30,-30,-40,-40,-30,-30,-20,
+      -10,-20,-20,-20,-20,-20,-20,-10,
+       20, 20,  0,  0,  0,  0, 20, 20,
+       20, 30, 10,  0,  0, 10, 30, 20
+    }
+};
+
+static u64 searchNodes;
+
+/* static evaluation, returned from the side-to-move's point of view (negamax) */
+int evaluate(const position_t *pos){
+    int score = 0;   /* + favours White */
+    u64 occ = ~pos->pieces[EMPTY];
+    while(occ){
+        int sq = popFirstBit(&occ);
+        int pc = getPiece(pos, sq);
+        if(getColor(pos, sq) == WHITE) score += PieceValue[pc] + PST[pc][sq ^ 56];
+        else                           score -= PieceValue[pc] + PST[pc][sq];
+    }
+    return (pos->side == WHITE) ? score : -score;
+}
+
+/* negamax alpha-beta. Legality is verified the same way as perft: make the
+   move then reject it if the moving side left its own king in check. */
+int alphaBeta(position_t *pos, int alpha, int beta, int depth, int ply){
+    movelist_t ml;
+    int i, score, legal = 0, best = -SCORE_INF;
+    if(depth <= 0) return evaluate(pos);
+    searchNodes++;
+    genMoves(pos, &ml);
+    for(i = 0; i < (int)ml.size; i++){
+        int m = ml.list[i].m;
+        makeMove(pos, m);
+        if(isAtt(pos, pos->side, pos->pieces[KING] & pos->color[pos->side^1])){
+            unmakeMove(pos);
+            continue;
+        }
+        legal = 1;
+        score = -alphaBeta(pos, -beta, -alpha, depth - 1, ply + 1);
+        unmakeMove(pos);
+        if(score > best){
+            best = score;
+            if(score > alpha) alpha = score;
+            if(alpha >= beta) return best;   /* beta cut-off */
+        }
+    }
+    if(!legal){
+        /* no legal move: checkmate if in check, otherwise stalemate */
+        if(isAtt(pos, pos->side^1, pos->pieces[KING] & pos->color[pos->side]))
+            return -SCORE_MATE + ply;
+        return 0;
+    }
+    return best;
+}
+
+/* root search with iterative deepening; returns the chosen move (0 if none) */
+int searchRoot(position_t *pos, int maxdepth){
+    movelist_t ml;
+    int d, i, score, bestmove = 0, firstlegal = 0;
+    for(d = 1; d <= maxdepth; d++){
+        int alpha = -SCORE_INF, best = -SCORE_INF, itbest = bestmove;
+        searchNodes = 0;
+        genMoves(pos, &ml);
+        for(i = 0; i < (int)ml.size; i++){
+            int m = ml.list[i].m;
+            makeMove(pos, m);
+            if(isAtt(pos, pos->side, pos->pieces[KING] & pos->color[pos->side^1])){
+                unmakeMove(pos);
+                continue;
+            }
+            if(!firstlegal) firstlegal = m;
+            score = -alphaBeta(pos, -SCORE_INF, -alpha, d - 1, 1);
+            unmakeMove(pos);
+            if(score > best){ best = score; itbest = m; if(score > alpha) alpha = score; }
+        }
+        bestmove = itbest;
+    }
+    if(!bestmove) bestmove = firstlegal;   /* safety net: always return a legal move */
+    return bestmove;
+}
+
 /* parse the move from string and returns a move from the
-move list of generated moves if the move string matched 
+move list of generated moves if the move string matched
 one of them */
 int parseMove(char *s, movelist_t *ml){
     int m, from, to, p;
@@ -1615,33 +1784,36 @@ int parseMove(char *s, movelist_t *ml){
 int main(int argc, char *argv[]){
     position_t pos;
     movelist_t ml;
-    char command[256];
+    char command[4096];
     char temp[256];
     int move;
     int i;
-    
+    int quiet = FALSE;   /* suppress the per-turn board/movelist dump (engine-vs-engine) */
+
     Print(3, "Twisted Logic Revenge alpha by Edsel Apostol\n");
     Print(3, "under development, please type help for commands\n\n");
-    
+
     logfile = fopen("logfile.txt", "w+");
     errfile = fopen("errfile.txt", "w+");
     dumpfile = fopen("dumpfile.txt", "w+");
-    
+
     initArr();
-    
+
     setPosition(&pos, FenString[0]);
-    
+
     while(TRUE){
-        displayBoard(&pos, 3);
         genMoves(&pos, &ml);
-        Print(3, "pseudo-legal moves = %d:", ml.size);
-        for(ml.pos = 0; ml.pos < ml.size; ml.pos++){
-            if(!(ml.pos%12)) Print(3, "\n");
-            Print(3, "%s ", move2Str(ml.list[ml.pos].m));
-        }    
-        Print(3, "\n\n");
-        Print(1, "Logic >>");
-       	if(!fgets(command, 256, stdin)) break;
+        if(!quiet){
+            displayBoard(&pos, 3);
+            Print(3, "pseudo-legal moves = %d:", ml.size);
+            for(ml.pos = 0; ml.pos < ml.size; ml.pos++){
+                if(!(ml.pos%12)) Print(3, "\n");
+                Print(3, "%s ", move2Str(ml.list[ml.pos].m));
+            }
+            Print(3, "\n\n");
+            Print(1, "Logic >>");
+        }
+       	if(!fgets(command, sizeof(command), stdin)) break;
         if(command[0]=='\n') continue;
         sscanf(command, "%s", temp);
         if(!strcmp(temp, "new")){
@@ -1651,6 +1823,29 @@ int main(int argc, char *argv[]){
         }else if(!strcmp(temp, "perft")){
             sscanf(command, "perft %d", &move);
             runPerft(move);
+        }else if(!strcmp(temp, "play")){
+            /* play <depth> <m1> <m2> ... : reset to start, replay the moves,
+               search to <depth>, and print "bestmove <coord>" for the arbiter */
+            char *tok;
+            int depth = 1, bm;
+            quiet = TRUE;
+            setPosition(&pos, FenString[0]);
+            strtok(command, " \t\r\n");            /* "play" */
+            tok = strtok(NULL, " \t\r\n");          /* depth */
+            if(tok) depth = atoi(tok);
+            if(depth < 1) depth = 1;
+            while((tok = strtok(NULL, " \t\r\n")) != NULL){
+                genMoves(&pos, &ml);
+                move = parseMove(tok, &ml);
+                if(!move){ printf("bestmove error\n"); fflush(stdout); break; }
+                makeMove(&pos, move);
+            }
+            if(tok == NULL){       /* every listed move applied cleanly */
+                bm = searchRoot(&pos, depth);
+                if(bm) printf("bestmove %s\n", move2Str(bm));
+                else   printf("bestmove none\n");
+                fflush(stdout);
+            }
         }else if(!strcmp(temp, "quit")){
             break;
         }else if(!strcmp(temp, "help")){
@@ -1658,11 +1853,12 @@ int main(int argc, char *argv[]){
             Print(3, "new - initialize to the starting position\n");
             Print(3, "undo - undo the last move done\n");
             Print(3, "perft X - do a perft test from a set of test positions for depth X\n");
+            Print(3, "play D m1 m2 ... - reset, replay moves, search depth D, print bestmove\n");
             Print(3, "quit - quits the program\n");
             Print(3, "this are the only commands as of now\n");
-            Print(3, "press any key to continue...\n");
-            getch();
-        }else{    
+            Print(3, "press ENTER to continue...\n");
+            getchar();
+        }else{
             move = parseMove(command, &ml);
             if(move){
                 makeMove(&pos, move);
